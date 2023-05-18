@@ -1,9 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <stdbool.h>
 
 #define MAX 1024
 #define MAXCOUNT 10
+
+int flag = false;
+
+void handle_sigint(int sig) {
+    flag = true; // flagë¥¼ trueë¡œ ë³€ê²½
+}
 
 void cat(char* (*argv)[])
 {
@@ -14,15 +22,20 @@ void cat(char* (*argv)[])
 
     if (strcmp((*argv)[1], ">") == 0) {
         fp = fopen((*argv)[2], "w");
+
         if (fp == NULL) {
             perror("can't open");
             return;
         }
+        signal(SIGINT, handle_sigint); // ^Cë¥¼ ìž…ë ¥ë°›ëŠ” ê²½ìš° ì˜ˆì™¸ ì²˜ë¦¬
 
         while (fgets(buf, MAX, stdin) != NULL) {
             fprintf(fp, "%s", buf);
+            if (flag == true){ // ^Cê°€ ìž…ë ¥ë°›ì•„ì§„ ê²½ìš°
+                flag = false; // ì›ëž˜ëŒ€ë¡œ ë§Œë“¤ê³ 
+                break; // ë°˜ë³µë¬¸ íƒˆì¶œ
+            }
         }
-        printf("\n");
         fclose(fp);
     }
     else if(strcmp((*argv)[1], "-n")==0)
@@ -57,16 +70,16 @@ void cat(char* (*argv)[])
     }
         else if(strcmp((*argv)[1], "-s")==0) {
         int i;
-        int num_empty_lines = 0;  // ÇöÀç±îÁö ÀúÀåµÈ ºó ÁÙÀÇ °³¼ö
-        char *temp_buf[MAX];     // ¶óÀÎÀ» ÀÓ½Ã·Î ÀúÀåÇÏ´Â ¹öÆÛ
-        int num_lines = 0;       // ÇöÀç±îÁö ÀúÀåµÈ ¶óÀÎÀÇ °³¼ö
+        int num_empty_lines = 0;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        char *temp_buf[MAX];     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ó½Ã·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
+        int num_lines = 0;       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         for (i = 2; (*argv)[i] != NULL; i++) {
             if (fp = fopen((*argv)[i], "r")) {
                 while (fgets(buf, MAX, fp)) {
-                    // ¸¸¾à ÇöÀç ¶óÀÎÀÌ ºó ÁÙÀÎ °æ¿ì
+                    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                     if (strcmp(buf, "\n") == 0) {
                         num_empty_lines++;
-                        // ÀÌ¹Ì ºó ÁÙÀÌ ÇÏ³ª ÀÌ»ó ÀúÀåµÈ »óÅÂÀÌ¸é continue
+                        // ï¿½Ì¹ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ ï¿½Ì»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½ continue
                         if (num_empty_lines > 1) {
                             continue;
                         }
@@ -74,7 +87,7 @@ void cat(char* (*argv)[])
                     else {
                         num_empty_lines = 0;
                     }
-                    // ÇöÀç ¶óÀÎÀ» ¹öÆÛ¿¡ ÀúÀå
+                    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½
                     temp_buf[num_lines] = malloc(sizeof(char) * strlen(buf) + 1);
                     strcpy(temp_buf[num_lines], buf);
                     num_lines++;
@@ -82,16 +95,16 @@ void cat(char* (*argv)[])
                 fclose(fp);
             }
         }
-        // ¹öÆÛ¿¡ ÀúÀåµÈ ¶óÀÎÀ» Ãâ·Â
+        // ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         for (i = 0; i < num_lines; i++) {
             printf("%s", temp_buf[i]);
-            // ¸¸¾à ÇöÀç ¶óÀÎÀÌ ¸¶Áö¸· ¶óÀÎÀÌ ¾Æ´Ï¸é¼­ ´ÙÀ½ ¶óÀÎÀÌ ºó ÁÙÀÌ ¾Æ´Ñ °æ¿ì
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï¸é¼­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ï¿½
             if (i < num_lines - 1 && strcmp(temp_buf[i + 1], "\n") != 0) {
                 printf("\n");
             }
         }
         printf("\n");
-        // ÀÓ½Ã ¹öÆÛ¿¡ ÀúÀåµÈ ¶óÀÎÀ» ¸Þ¸ð¸®¿¡¼­ ÇØÁ¦
+        // ï¿½Ó½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ð¸®¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         for (i = 0; i < num_lines; i++) {
             free(temp_buf[i]);
         }

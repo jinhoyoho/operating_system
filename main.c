@@ -6,9 +6,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-// ���丮 ���� �Լ� ���
 #include "ls.h"
-
+#include "cat.h"
 
 
 #define MAXCOUNT 10
@@ -58,7 +57,7 @@ int main()
         }
         else if (strcmp(argv[0], "cat") == 0)
         {
-            printf("cat\n");
+            cat(&argv);
         }
         else if (strcmp(argv[0], "chmod") == 0)
         {
