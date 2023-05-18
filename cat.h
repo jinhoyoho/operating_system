@@ -70,16 +70,14 @@ void cat(char* (*argv)[])
     }
         else if(strcmp((*argv)[1], "-s")==0) {
         int i;
-        int num_empty_lines = 0;  // ������� ����� �� ���� ����
-        char *temp_buf[MAX];     // ������ �ӽ÷� �����ϴ� ����
-        int num_lines = 0;       // ������� ����� ������ ����
+        int num_empty_lines = 0;  
+        char *temp_buf[MAX];     
+        int num_lines = 0;       
         for (i = 2; (*argv)[i] != NULL; i++) {
             if (fp = fopen((*argv)[i], "r")) {
                 while (fgets(buf, MAX, fp)) {
-                    // ���� ���� ������ �� ���� ���
                     if (strcmp(buf, "\n") == 0) {
                         num_empty_lines++;
-                        // �̹� �� ���� �ϳ� �̻� ����� �����̸� continue
                         if (num_empty_lines > 1) {
                             continue;
                         }
@@ -87,7 +85,6 @@ void cat(char* (*argv)[])
                     else {
                         num_empty_lines = 0;
                     }
-                    // ���� ������ ���ۿ� ����
                     temp_buf[num_lines] = malloc(sizeof(char) * strlen(buf) + 1);
                     strcpy(temp_buf[num_lines], buf);
                     num_lines++;
@@ -95,16 +92,15 @@ void cat(char* (*argv)[])
                 fclose(fp);
             }
         }
-        // ���ۿ� ����� ������ ���
+      
         for (i = 0; i < num_lines; i++) {
             printf("%s", temp_buf[i]);
-            // ���� ���� ������ ������ ������ �ƴϸ鼭 ���� ������ �� ���� �ƴ� ���
+           
             if (i < num_lines - 1 && strcmp(temp_buf[i + 1], "\n") != 0) {
                 printf("\n");
             }
         }
         printf("\n");
-        // �ӽ� ���ۿ� ����� ������ �޸𸮿��� ����
         for (i = 0; i < num_lines; i++) {
             free(temp_buf[i]);
         }

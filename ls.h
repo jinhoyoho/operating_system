@@ -7,8 +7,8 @@ int ls(char* (*argv)[])
     //현재 디렉토리 시작부터 다음 시작까지의 offset(d_off), 파일 이름(d_name)과 파일 이름의 길이(d_reclen) 저장
     struct stat file_state; // file의 상태 확인을 위한 구조체
 
-    struct passwd* user_pw; // user 정보
-    struct group* g_id; // group 정보
+    struct passwd* user_id; // user 정보
+    struct group* group_id; // group 정보
     int len; // 길이
     char* date; // 날짜
 
@@ -18,22 +18,15 @@ int ls(char* (*argv)[])
         while ((file_name = readdir(dir)) != NULL) // directory가 빌 때 까지 반복한다
         {
             char first_char = file_name->d_name[0]; // 첫 번째 글자 확인
-            if (first_char == '.') // '.'으로 시작하는 파일은 숨김 파일이다 -> continue로 넘어감
-            {
-                continue; // 넘기기
-            }
-            else
-            {
+            if (first_char != '.') // '.'으로 시작하는 파일은 숨김 파일이다 -> continue로 넘어감
                 printf("%s   ", file_name->d_name); // 이름 출력
-            }
-
         }
         printf("\n");
         closedir(dir); // directory 닫기
     }
     else if (strcmp((*argv)[1], "-a") == 0) // 'ls -a'입력시 -> 숨김 속성 파일 표시
     {
-        dir = opendir("."); //
+        dir = opendir("."); 
         while ((file_name = readdir(dir)) != NULL)
         {
             printf("%s   ", file_name->d_name);
@@ -42,67 +35,107 @@ int ls(char* (*argv)[])
         closedir(dir);
 
     }
-    else if (strcmp((*argv)[1], "-l") == 0) // 
+    else if (strcmp((*argv)[1], "-l") == 0) // "-l"인 경우
     {
         dir = opendir(".");
         while ((file_name = readdir(dir)) != NULL)
         {
             stat(file_name->d_name, &file_state);
 
-            user_pw = getpwuid(file_state.st_uid); // 
-            g_id = getgrgid(file_state.st_gid); // 
+            user_id = getpwuid(file_state.st_uid); 
+            group_id = getgrgid(file_state.st_gid); 
 
-            date = ctime(&file_state.st_mtime); // 
-            len = strlen(date); // 
+            date = ctime(&file_state.st_mtime); 
+            len = strlen(date); 
+            int index = 0;
+            char list[20];
 
             char first_char = file_name->d_name[0]; // 첫 번째 글자 확인
-                if (first_char == '.') {  // '.'으로 시작하는 파일은 숨김 파일이다 -> continue로 넘어감
-                    continue;
+                if (first_char != '.') 
+                {  // '.'으로 시작하는 파일은 숨김 파일이다 -> continue로 넘어감
+                // permissions
+                    switch (file_state.st_mode & S_IFMT)
+                    {
+                        case S_IFDIR :
+                            list[index++] = 'd';
+                            break;
+                        default:
+                            list[index++] = '-';
+                            break;
+                    }
+                    for (int i=0; i<3; i++) {   //   파일 접근 권한 알아내기
+                        if (file_state.st_mode & (S_IREAD >> i*3))
+                            list[index++] = 'r';
+                        else
+                            list[index++] = '-';
+                        if (file_state.st_mode & (S_IWRITE >> i*3))
+                            list[index++] = 'w';
+                        else
+                            list[index++] = '-';
+                        if (file_state.st_mode & (S_IEXEC >> i*3))
+                            list[index++] = 'x';
+                        else
+                            list[index++] = '-';
+                    }
+                    list[index] = '\0';
+
+                    printf("%s", list);
+                // 링크 수, 소유자 이름, 그룹 이름, 파일 크기, 날짜, 제목 출력
+                    printf(" %ld\t %s\t %s\t %lld\t %.*s\t %s\n", (long)file_state.st_nlink, user_id->pw_name, group_id->gr_name, (long long)file_state.st_size, len - 1, date, file_name->d_name);
                 }
-            
-            // permissions
-            printf("%c", S_ISDIR(file_state.st_mode) ? 'd' : '-'); 
-            printf("%c", file_state.st_mode & S_IRUSR ? 'r' : '-');
-            printf("%c", file_state.st_mode & S_IWUSR ? 'w' : '-');
-            printf("%c", file_state.st_mode & S_IXUSR ? 'x' : '-');
-            printf("%c", file_state.st_mode & S_IRGRP ? 'r' : '-');
-            printf("%c", file_state.st_mode & S_IWGRP ? 'w' : '-');
-            printf("%c", file_state.st_mode & S_IXGRP ? 'x' : '-');
-            printf("%c", file_state.st_mode & S_IROTH ? 'r' : '-');
-            printf("%c", file_state.st_mode & S_IWOTH ? 'w' : '-');
-            printf("%c", file_state.st_mode & S_IXOTH ? 'x' : '-');
-            
-            // 링크 수, 소유자 이름, 그룹 이름, 파일 크기, 날짜, 제목 출력
-            printf(" %ld\t %s\t %s\t %lld\t %.*s\t %s\n", (long)file_state.st_nlink, user_pw->pw_name, g_id->gr_name, (long long)file_state.st_size, len - 1, date, file_name->d_name);
-        }
+            }
         closedir(dir);
     }
-    else if (strcmp((*argv)[1], "-al") == 0) // 
+    else if (strcmp((*argv)[1], "-al") == 0) // "-al"인 경우
     {
         dir = opendir(".");
         while ((file_name = readdir(dir)) != NULL)
         {
             stat(file_name->d_name, &file_state);
 
-            user_pw = getpwuid(file_state.st_uid); //  uid를 이용해서 user 정보를 얻음
-            g_id = getgrgid(file_state.st_gid); // group id를 이용해서 group 정보를 얻음
+            user_id = getpwuid(file_state.st_uid); //  uid를 이용해서 user 정보를 얻음
+            group_id = getgrgid(file_state.st_gid); // group id를 이용해서 group 정보를 얻음
 
             date = ctime(&file_state.st_mtime); // 시간
-            len = strlen(date); // 
+            len = strlen(date); 
 
-            printf("%c", S_ISDIR(file_state.st_mode) ? 'd' : '-');
-            printf("%c", file_state.st_mode & S_IRUSR ? 'r' : '-');
-            printf("%c", file_state.st_mode & S_IWUSR ? 'w' : '-');
-            printf("%c", file_state.st_mode & S_IXUSR ? 'x' : '-');
-            printf("%c", file_state.st_mode & S_IRGRP ? 'r' : '-');
-            printf("%c", file_state.st_mode & S_IWGRP ? 'w' : '-');
-            printf("%c", file_state.st_mode & S_IXGRP ? 'x' : '-');
-            printf("%c", file_state.st_mode & S_IROTH ? 'r' : '-');
-            printf("%c", file_state.st_mode & S_IWOTH ? 'w' : '-');
-            printf("%c", file_state.st_mode & S_IXOTH ? 'x' : '-');
-            // 링크 수, 소유자 이름, 그룹 이름, 파일 크기, 날짜, 제목 출력
-            printf(" %ld\t %s\t %s\t %lld\t %.*s\t %s\n", (long)file_state.st_nlink, user_pw->pw_name, g_id->gr_name, (long long)file_state.st_size, len - 1, date, file_name->d_name);
-        }
+            int index = 0;
+            char list[20];
+
+            char first_char = file_name->d_name[0]; // 첫 번째 글자 확인
+                
+            
+            // permissions
+                switch (file_state.st_mode & S_IFMT)
+                {
+                    case S_IFDIR :
+                        list[index++] = 'd';
+                        break;
+                    default:
+                        list[index++] = '-';
+                        break;
+                }
+                for (int i=0; i<3; i++) {   // 파일 접근 권한 알아내기
+                    if (file_state.st_mode & (S_IREAD >> i*3))
+                        list[index++] = 'r';
+                    else
+                        list[index++] = '-';
+                    if (file_state.st_mode & (S_IWRITE >> i*3))
+                        list[index++] = 'w';
+                    else
+                        list[index++] = '-';
+                    if (file_state.st_mode & (S_IEXEC >> i*3))
+                        list[index++] = 'x';
+                    else
+                        list[index++] = '-';
+                }
+                list[index] = '\0';
+
+                printf("%s", list);
+                // 링크 수, 소유자 이름, 그룹 이름, 파일 크기, 날짜, 제목 출력
+                printf(" %ld\t %s\t %s\t %lld\t %.*s\t %s\n", (long)file_state.st_nlink, user_id->pw_name, group_id->gr_name, (long long)file_state.st_size, len - 1, date, file_name->d_name);
+            
+            }
         closedir(dir);
     }
     else if (strcmp((*argv)[1], "-i") == 0) // -i 옵션(file의 index 출력)
@@ -112,11 +145,11 @@ int ls(char* (*argv)[])
         {
             stat(file_name->d_name, &file_state);
 
-            user_pw = getpwuid(file_state.st_uid); // 
-            g_id = getgrgid(file_state.st_gid); // 
+            user_id = getpwuid(file_state.st_uid); 
+            group_id = getgrgid(file_state.st_gid); 
 
-            date = ctime(&file_state.st_mtime); // 
-            len = strlen(date); // 
+            date = ctime(&file_state.st_mtime); 
+            len = strlen(date); 
 
             char first_char = file_name->d_name[0]; // 첫 번째 글자 확인
                 if (first_char == '.') {  // '.'으로 시작하는 파일은 숨김 파일이다 -> continue로 넘어감
@@ -142,7 +175,7 @@ int ls(char* (*argv)[])
         printf("\n");
         closedir(dir); // directory 닫기
     }
-    else //
+    else // 명령어가 잘 못 입력된 경우
     {
         dir = opendir((*argv)[1]);
         if (dir == NULL)
