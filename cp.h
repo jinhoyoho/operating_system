@@ -1,21 +1,25 @@
 #include "./headers.h"
 
+#define BUFSIZE 4096
+
 void cp(char* (*argv)[])
 {
     char ch;
     int on = 0;
     DIR *dir;
     struct dirent *entry = NULL;
-    FILE *src, *dst;
-    char *token, buf[1024], newfile[1024];
-    getcwd(buf, 1024);
+    FILE *src, *dst; // 복사하려는 source 파일과 destination 파일
+    char *token, buf[BUFSIZE], newfile[BUFSIZE];
+    
+    getcwd(buf, BUFSIZE); // 현재 작업중인 디렉토리를 알려줌
 
-    if((src = fopen((*argv)[1], "r")) == NULL){
-        fprintf(stderr, "%s: Can't open file.\n", (*argv)[1]);
-        return;
+    if((src = fopen((*argv)[1], "r")) == NULL){ // source file을 열 수 없다면
+        fprintf(stderr, "cp: cannot stat '%s': No such file or directory", (*argv)[1]); // 오류메세지 출력하고
+        return; // 종료
     }
 
     token = strtok((*argv)[2], "/");
+    
     while(token != NULL) {
         
         strcpy(newfile, token);

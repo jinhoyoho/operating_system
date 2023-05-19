@@ -8,6 +8,7 @@
 
 #include "ls.h"
 #include "cat.h"
+#include "cp.h"
 
 
 #define MAXCOUNT 10
@@ -73,7 +74,7 @@ int main()
         }
         else if (strcmp(argv[0], "cp") == 0)
         {
-            printf("cp\n");
+            cp(&argv);
         }
         else if (strcmp(argv[0], "find") == 0)
         {
