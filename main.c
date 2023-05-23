@@ -10,6 +10,8 @@
 #include "cat.h"
 #include "cp.h"
 #include "cd.h"
+#include "mkdir_.h"
+#include "grep.h"
 
 
 #define MAXCOUNT 10
@@ -37,6 +39,8 @@ int main()
     char command[1024];
     char* argv[MAXCOUNT] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, };
 
+    int argc;
+  
     do {
         getcwd(current, 1024);
         printf("%s > ", current);
@@ -55,7 +59,7 @@ int main()
         }
         else if (strcmp(argv[0], "mkdir") == 0)
         {
-            printf("mkdir\n");
+            mkdir_(argc, argv);
         }
         else if (strcmp(argv[0], "cat") == 0)
         {
@@ -71,7 +75,31 @@ int main()
         }
         else if (strcmp(argv[0], "grep") == 0)
         {
-            printf("grep\n");
+            if (argv[1] != NULL && argv[2] != NULL) {
+                int show_line_numbers = 0;
+                int invert_match = 0;
+                int ignore_case = 0;
+                int arg_index = 1;
+
+                if (strcmp(argv[arg_index], "-n") == 0) {
+                    show_line_numbers = 1;
+                    arg_index++;
+                }
+
+                if (strcmp(argv[arg_index], "-v") == 0) {
+                    invert_match = 1;
+                    arg_index++;
+                }
+
+                if (strcmp(argv[arg_index], "-i") == 0) {
+                    ignore_case = 1;
+                    arg_index++;
+                }
+
+                grep(argv[arg_index], argv[arg_index + 1], show_line_numbers, invert_match, ignore_case);
+            } else {
+                printf("grep ���ɾ��� ����: grep [-n] [-v] [-i] <����> <���ϸ�>\n");
+            }
         }
         else if (strcmp(argv[0], "cp") == 0)
         {
