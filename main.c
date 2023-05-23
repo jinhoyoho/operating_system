@@ -9,6 +9,7 @@
 #include "ls.h"
 #include "cat.h"
 #include "cp.h"
+#include "cd.h"
 
 
 #define MAXCOUNT 10
@@ -50,7 +51,7 @@ int main()
         }
         else if (strcmp(argv[0], "cd") == 0)
         {
-            printf("cd\n");
+            cd(current, argv+1);
         }
         else if (strcmp(argv[0], "mkdir") == 0)
         {
