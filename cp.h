@@ -10,7 +10,7 @@ void cp(char* (*argv)[]) // 옵션없이 하나만 구현
     struct dirent *entry = NULL;
     FILE *src, *dst; // 복사하려는 source 파일과 destination 파일
     char *flag, buf[BUFSIZE], newfile_name[BUFSIZE];
-    char * current;
+    char * current, ret;
     
     current = getcwd(buf, BUFSIZE); // 현재 작업중인 디렉토리를 알려줌
 
@@ -34,12 +34,12 @@ void cp(char* (*argv)[]) // 옵션없이 하나만 구현
     while((entry = readdir(dir))!=NULL)
     {
         if(strcmp(entry->d_name, newfile_name)==0 && entry->d_type == DT_DIR) // directory인 경우
-            dir_flag = true
+            is_dir = true;
     }
 
-    if (dir_flag == false) // 2번째 인자가 파일인 경우
+    if (is_dir == false) // 2번째 인자가 파일인 경우
     {
-        dst = fopen(newfile_name,"w") // newfile_name이란 이름으로 파일을 생성함
+        dst = fopen(newfile_name,"w"); // newfile_name이란 이름으로 파일을 생성함
         if(dst == NULL)
         {
             fprintf(stderr, "%s: Can't open file.\n", (*argv)[1]);
@@ -48,7 +48,7 @@ void cp(char* (*argv)[]) // 옵션없이 하나만 구현
     }
     else // 2번째 인자가 directory인 경우
     {
-        dst = fopen((*argv)[1], "w") // 기존에 있는 파일을 새로운 directory로 이동함
+        dst = fopen((*argv)[1], "w"); // 기존에 있는 파일을 새로운 directory로 이동함
         if (dst == NULL)
         {
             fprintf(stderr, "%s: Can't open file.\n", newfile_name);
@@ -62,7 +62,7 @@ void cp(char* (*argv)[]) // 옵션없이 하나만 구현
     }
 
 
-    chdir(curret); // 현재 위치로 다시 복귀
+    chdir(current); // 현재 위치로 다시 복귀
 
     fclose(src);
     fclose(dst);

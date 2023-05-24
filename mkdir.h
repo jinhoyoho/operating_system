@@ -13,7 +13,8 @@
 #include <sys/syscall.h> // mkdir
 #include <sys/types.h> // mkdir
 #include <fcntl.h> // mkdir
-#include <pthread/pthread.h> // mkdir
+//#include <pthread/pthread.h> // mkdir
+#include <pthread.h> // mkdir
 #include <errno.h> // mkdir
 
 void mkdir_(int argc, char *argv[]);

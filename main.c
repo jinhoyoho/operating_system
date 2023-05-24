@@ -10,7 +10,7 @@
 #include "cat.h"
 #include "cp.h"
 #include "cd.h"
-#include "mkdir_.h"
+//#include "mkdir.h"
 #include "grep.h"
 
 
@@ -59,7 +59,7 @@ int main()
         }
         else if (strcmp(argv[0], "mkdir") == 0)
         {
-            mkdir_(argc, argv);
+            //mkdir(argc, argv);
         }
         else if (strcmp(argv[0], "cat") == 0)
         {
