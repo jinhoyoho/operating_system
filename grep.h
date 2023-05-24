@@ -27,7 +27,7 @@ char* strcasestr(const char* line, const char* pattern) {
 void grep(const char *pattern, const char *filename, int show_line_numbers, int invert_match, int ignore_case) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        printf("파일을 열 수 없습니다.\n");
+        printf("can't open file!\n");
         return;
     }
 
