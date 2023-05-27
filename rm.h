@@ -9,31 +9,31 @@ int rmdirs(const char *path) {
      DIR * dir_ptr = NULL;
      struct dirent *file = NULL;
      struct stat buf;
-     char filename[1024]; /* ¸ñ·ÏÀ» ÀÐÀ» µð·ºÅä¸®¸íÀ¸·Î DIR *¸¦ return ¹Þ½À´Ï´Ù. */
+     char filename[1024]; /* ëª©ë¡ì„ ì½ì„ ë””ë ‰í† ë¦¬ëª…ìœ¼ë¡œ DIR *ë¥¼ return ë°›ìŠµë‹ˆë‹¤. */
      if((dir_ptr = opendir(path)) == NULL)
-     { /* path°¡ µð·ºÅä¸®°¡ ¾Æ´Ï¶ó¸é »èÁ¦ÇÏ°í Á¾·áÇÕ´Ï´Ù. */
+     { /* pathê°€ ë””ë ‰í† ë¦¬ê°€ ì•„ë‹ˆë¼ë©´ ì‚­ì œí•˜ê³  ì¢…ë£Œí•©ë‹ˆë‹¤. */
         return unlink(path);
      }
-      /* µð·ºÅä¸®ÀÇ Ã³À½ºÎÅÍ ÆÄÀÏ ¶Ç´Â µð·ºÅä¸®¸íÀ» ¼ø¼­´ë·Î ÇÑ°³¾¿ ÀÐ½À´Ï´Ù. */
+      /* ë””ë ‰í† ë¦¬ì˜ ì²˜ìŒë¶€í„° íŒŒì¼ ë˜ëŠ” ë””ë ‰í† ë¦¬ëª…ì„ ìˆœì„œëŒ€ë¡œ í•œê°œì”© ì½ìŠµë‹ˆë‹¤. */
     while((file = readdir(dir_ptr)) != NULL) {
-        // readdir ÀÐÇôÁø ÆÄÀÏ¸í Áß¿¡ ÇöÀç µð·ºÅä¸®¸¦ ³ªÅ¸³×´Â . µµ Æ÷ÇÔµÇ¾î ÀÖÀ¸¹Ç·Î // ¹«ÇÑ ¹Ýº¹¿¡ ºüÁöÁö ¾ÊÀ¸·Á¸é ÆÄÀÏ¸íÀÌ . ÀÌ¸é skip ÇØ¾ß ÇÔ
+        // readdir ì½í˜€ì§„ íŒŒì¼ëª… ì¤‘ì— í˜„ìž¬ ë””ë ‰í† ë¦¬ë¥¼ ë‚˜íƒ€ë„¤ëŠ” . ë„ í¬í•¨ë˜ì–´ ìžˆìœ¼ë¯€ë¡œ // ë¬´í•œ ë°˜ë³µì— ë¹ ì§€ì§€ ì•Šìœ¼ë ¤ë©´ íŒŒì¼ëª…ì´ . ì´ë©´ skip í•´ì•¼ í•¨
         if(strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0) {
             continue;
         }
         sprintf(filename, "%s/%s", path, file->d_name);
-        /* ÆÄÀÏÀÇ ¼Ó¼º(ÆÄÀÏÀÇ À¯Çü, Å©±â, »ý¼º/º¯°æ ½Ã°£ µîÀ» ¾ò±â À§ÇÏ¿© */
+        /* íŒŒì¼ì˜ ì†ì„±(íŒŒì¼ì˜ ìœ í˜•, í¬ê¸°, ìƒì„±/ë³€ê²½ ì‹œê°„ ë“±ì„ ì–»ê¸° ìœ„í•˜ì—¬ */
         if(stat(filename, &buf) == -1)
         {
             continue;
         }
         if(S_ISDIR(buf.st_mode)) {
-            // °Ë»öµÈ ÀÌ¸§ÀÇ ¼Ó¼ºÀÌ µð·ºÅä¸®ÀÌ¸é /* °Ë»öµÈ ÆÄÀÏÀÌ directoryÀÌ¸é Àç±ÍÈ£Ãâ·Î ÇÏÀ§ µð·ºÅä¸®¸¦ ´Ù½Ã °Ë»ö */
+            // ê²€ìƒ‰ëœ ì´ë¦„ì˜ ì†ì„±ì´ ë””ë ‰í† ë¦¬ì´ë©´ /* ê²€ìƒ‰ëœ íŒŒì¼ì´ directoryì´ë©´ ìž¬ê·€í˜¸ì¶œë¡œ í•˜ìœ„ ë””ë ‰í† ë¦¬ë¥¼ ë‹¤ì‹œ ê²€ìƒ‰ */
             if(rmdirs(filename) == -1) {
                 return -1;
             }
         }
         else if(S_ISREG(buf.st_mode)) {
-            // ÀÏ¹ÝÆÄÀÏ ¶Ç´Â symbolic link ÀÌ¸é
+            // ì¼ë°˜íŒŒì¼ ë˜ëŠ” symbolic link ì´ë©´
             if(unlink(filename) == -1) {
                 return -1;
             }

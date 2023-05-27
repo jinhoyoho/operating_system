@@ -117,9 +117,9 @@ int main()
             char* path = argv[0] + 3; // "rm" 이후의 경로 부분
             if (rmdirs(path) == 0) {
                 printf("The file or directory has been successfully deleted.\n");
+            }
             else {
                 printf("File or directory delection failed: %s\n", path);
-            }
             }
         }
         else if (strcmp(argv[0], "exit") == 0)

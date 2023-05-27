@@ -37,11 +37,11 @@ int chmod_(int argc, char *argv[])
     char *token;
 
     if (argc<3){
-        printf("Error\n"); //ÀÎÀÚ°¡ 3°³ ÀÔ·ÂµÇ¾î¾ß ÇÏ´Âµ¥ Àû°Ô ÀÔ·ÂµÉ °æ¿ì.
+        printf("Error\n");  //ì¸ìžê°€ 3ê°œ ìž…ë ¥ë˜ì–´ì•¼ í•˜ëŠ”ë° ì ê²Œ ìž…ë ¥ë  ê²½ìš°.
         return -1;
     }
     if(stat(argv[2], &file_exist) == -1){
-        printf("Can't access to %s\n", argv[2]); //f1ÆÄÀÏÀÌ Á¸ÀçÇÏÁö ¾ÊÀ¸¸é ¿À·ù
+        printf("Can't access to %s\n", argv[2]); //f1íŒŒì¼ì´ ì¡´ìž¬í•˜ì§€ ì•Šìœ¼ë©´ ì˜¤ë¥˜
         return -1;
     }
 
@@ -59,7 +59,7 @@ int chmod_(int argc, char *argv[])
             printf("   ");*/
     }
     else{
-        if(stat(argv[2], &buf)== -1){ //lstatÀ» statÀ¸·Î ¹Ù²Þ. //argv[2]ÀÇ ÆÄÀÏ»óÅÂ¸¦ buf ±¸Á¶Ã¼¿¡ ³Ö¾îÁÜ.
+        if(stat(argv[2], &buf)== -1){ //lstatì„ statìœ¼ë¡œ ë°”ê¿ˆ. //argv[2]ì˜ íŒŒì¼ìƒíƒœë¥¼ buf êµ¬ì¡°ì²´ì— ë„£ì–´ì¤Œ.
             printf("read data error");
             return -1;
         }
@@ -102,7 +102,7 @@ int chmod_(int argc, char *argv[])
                     case '=':
                         buf.st_mode = 0;
                         for (int i = 2; token[i] != '\0'; i++) {
-                            switch(token[i]){ // ¼öÁ¤ÇØ¾ß ÇÔ
+                            switch(token[i]){ // ìˆ˜ì •í•´ì•¼ í•¨
                                 case 'x':
                                     buf.st_mode |= S_IXUSR;
                                     break;
