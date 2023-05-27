@@ -3,67 +3,76 @@
 
 #define BUFSIZE 4096
 
+// cp는 src를 dst에 복사하는 명령어
+// 만약 dst가 file이면 덮어쓰기, directory면 해당 directory에 src이름으로 파일을 생성한다.
+
 void cp(char* (*argv)[]) // 옵션없이 하나만 구현
 {
-    int is_dir = 0;
-    DIR *dir;
+    bool is_dir = false; // directory인지 file인지 구분하는 변수
     struct dirent *entry = NULL;
-    FILE *src, *dst; // 복사하려는 source 파일과 destination 파일
-    char *flag, buf[BUFSIZE], newfile_name[BUFSIZE];
-    char * current, ret;
-    
-    current = getcwd(buf, BUFSIZE); // 현재 작업중인 디렉토리를 알려줌
+    struct stat path_stat;
+    FILE *src, *dst; // 복사하려는 src(file), dst(directory or file)
+    char current[BUFSIZE], newfile_name[BUFSIZE], path[BUFSIZE], ch;
+
+    getcwd(current, BUFSIZE); // 현재 작업중인 디렉토리를 알려줌
 
     if((src = fopen((*argv)[1], "r")) == NULL) // source file을 열 수 없다면
     { 
-        fprintf(stderr, "cp: cannot stat '%s': No such file or directory", (*argv)[1]); // 오류메세지 출력하고
+        fprintf(stderr, "cp: cannot stat '%s': No such file or directory\n", (*argv)[1]); // 오류메세지 출력하고
         return; // 종료
     }
 
-    flag = strtok((*argv)[2], "/"); // dst 파일의 경로를 '/'를 기준으로 나눔
-    
-    while(flag != NULL) 
-    {
-        strcpy(newfile_name, flag); // newfile_name에 마지막 이름 저장
-        chdir(flag); // 경로 변경
-        flag = strtok(NULL, "/"); // 다음 문자열을 잘라서 포인터 반환
-    };
-    
-    dir = opendir("..");
+    // 새로 정할 파일 이름
+    char input[BUFSIZE];
+    strncpy(input, (*argv)[2], sizeof(input)-1);
+    input[sizeof(input)-1] = '\0';
 
-    while((entry = readdir(dir))!=NULL)
-    {
-        if(strcmp(entry->d_name, newfile_name)==0 && entry->d_type == DT_DIR) // directory인 경우
-            is_dir = true;
+    char* lastSlash = strrchr(input, '/'); // 문자열에서 마지막 슬래시 위치 찾기
+    memset(path, 0, sizeof(path));
+
+    if (lastSlash != NULL) {
+        strcpy(newfile_name, lastSlash + 1); // 파일 이름 복사
+        strncpy(path, (*argv)[2], lastSlash - input); // 경로 같이 이동
+    } else {
+        strcpy(newfile_name, input); // 슬래시가 없는 경우 전체 문자열을 파일 이름으로 간주
     }
+    // test_path엔 이전까지 경로가 들어감
+    chdir(path);
 
-    if (is_dir == false) // 2번째 인자가 파일인 경우
+
+    // directory인지 확인하는 코드
+    if (stat((*argv)[2], &path_stat) == 0)
     {
-        dst = fopen(newfile_name,"w"); // newfile_name이란 이름으로 파일을 생성함
-        if(dst == NULL)
-        {
-            fprintf(stderr, "%s: Can't open file.\n", (*argv)[1]);
-            return;
+        if (S_ISDIR(path_stat.st_mode)){
+            is_dir = true;
         }
     }
-    else // 2번째 인자가 directory인 경우
+
+    if (is_dir)
     {
-        dst = fopen((*argv)[1], "w"); // 기존에 있는 파일을 새로운 directory로 이동함
-        if (dst == NULL)
+        chdir(newfile_name); // directory이므로 해당 directory로 이동
+        if ((dst = fopen((*argv)[1], "w")) == NULL) // src를 dst directory로 복사함
         {
             fprintf(stderr, "%s: Can't open file.\n", newfile_name);
             return;
         }
     }
-
-    while(ret = fread(buf, 1, sizeof(buf), src))
+    else 
     {
-        fwrite(buf, 1, ret, dst);
+        if((dst = fopen(newfile_name, "w")) == NULL) // newfile_name 이름으로 파일을 생성함
+        {
+            fprintf(stderr, "%s: Can't open file.\n", (*argv)[1]);
+            return;
+        }
     }
-
+    
+    // 파일 복사
+    while ((ch = fgetc(src)) != EOF) { 
+        fputc(ch, dst);
+    }
 
     chdir(current); // 현재 위치로 다시 복귀
 
     fclose(src);
-    fclose(dst);
+    fclose(dst); // 파일 모두 닫기
 }
