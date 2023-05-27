@@ -12,12 +12,13 @@
 #include "cd.h"
 //#include "mkdir.h"
 #include "grep.h"
-
+#include "rm.h"
+#include "chmod.h"
 
 #define MAXCOUNT 10
 
 
-void command_split(char* command, char* (*argv)[])
+int command_split(char* command, char* (*argv)[])
 {
     int i = 0;
     char* token;
@@ -29,6 +30,8 @@ void command_split(char* command, char* (*argv)[])
         token = strtok(NULL, " ");
         i++;
     }
+
+    return i;
 }
 
 int main()
@@ -47,7 +50,7 @@ int main()
         scanf("%[^\n]s", command);
         getchar();
 
-        command_split(command, &argv);
+        argc = command_split(command, &argv);
 
         if (strcmp(argv[0], "ls") == 0)
         {
@@ -67,7 +70,7 @@ int main()
         }
         else if (strcmp(argv[0], "chmod") == 0)
         {
-            printf("chmod\n");
+            chmod_(argc, argv);
         }
         else if (strcmp(argv[0], "chown") == 0)
         {
@@ -111,7 +114,13 @@ int main()
         }
         else if (strcmp(argv[0], "rm") == 0)
         {
-            printf("rm\n");
+            char* path = argv[0] + 3; // "rm" 이후의 경로 부분
+            if (rmdirs(path) == 0) {
+                printf("The file or directory has been successfully deleted.\n");
+            else {
+                printf("File or directory delection failed: %s\n", path);
+            }
+            }
         }
         else if (strcmp(argv[0], "exit") == 0)
         {
