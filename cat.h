@@ -10,7 +10,7 @@
 int flag = false;
 
 void handle_sigint(int sig) {
-    flag = true; // flagë¥¼ trueë¡œ ë³€ê²½
+    flag = true; // flag¸¦ true·Î º¯°æ
 }
 
 void cat(char* (*argv)[])
@@ -19,6 +19,7 @@ void cat(char* (*argv)[])
 	int num = 1;
 	char buf[MAX];
 	FILE *fp;
+	FILE *dirFile;
 
     if (strcmp((*argv)[1], ">") == 0) {
         fp = fopen((*argv)[2], "w");
@@ -27,16 +28,45 @@ void cat(char* (*argv)[])
             perror("can't open");
             return;
         }
-        signal(SIGINT, handle_sigint); // ^Cë¥¼ ì…ë ¥ë°›ëŠ” ê²½ìš° ì˜ˆì™¸ ì²˜ë¦¬
+        signal(SIGINT, handle_sigint); // ^C¸¦ ÀÔ·Â¹Ş´Â °æ¿ì ¿¹¿Ü Ã³¸®
 
         while (fgets(buf, MAX, stdin) != NULL) {
             fprintf(fp, "%s", buf);
-            if (flag == true){ // ^Cê°€ ì…ë ¥ë°›ì•„ì§„ ê²½ìš°
-                flag = false; // ì›ë˜ëŒ€ë¡œ ë§Œë“¤ê³ 
-                break; // ë°˜ë³µë¬¸ íƒˆì¶œ
+            if (flag == true){ // ^C°¡ ÀÔ·Â¹Ş¾ÆÁø °æ¿ì
+                flag = false; // ¿ø·¡´ë·Î ¸¸µé°í
+                break; // ¹İº¹¹® Å»Ãâ
             }
         }
         fclose(fp);
+
+        FILE* dirFile = fopen("log.txt", "a+");
+        if (dirFile == NULL) {
+            perror("can't open log.txt");
+            return;
+        }
+
+        // Áßº¹µÈ ÆÄÀÏ ÀÌ¸§ÀÌ ÀÖ´ÂÁö È®ÀÎ
+        char line[MAX];
+        bool nameExists = false;
+        while (fgets(line, MAX, dirFile) != NULL) {
+            line[strcspn(line, "\n")] = '\0';  // °³Çà ¹®ÀÚ Á¦°Å
+            if (strcmp(line + 2, (*argv)[2]) == 0) {
+                nameExists = true;
+                break;
+            }
+        }
+        fclose(dirFile);
+
+        // Áßº¹µÈ ÆÄÀÏ ÀÌ¸§ÀÌ ¾øÀ¸¸é Ãß°¡
+        if (!nameExists) {
+            dirFile = fopen("log.txt", "a");
+            if (dirFile == NULL) {
+                perror("can't open log.txt");
+                return;
+            }
+            fprintf(dirFile, "f %s\n", (*argv)[2]);
+            fclose(dirFile);
+        }
     }
     else if(strcmp((*argv)[1], "-n")==0)
         {
@@ -70,9 +100,9 @@ void cat(char* (*argv)[])
     }
         else if(strcmp((*argv)[1], "-s")==0) {
         int i;
-        int num_empty_lines = 0;  
-        char *temp_buf[MAX];     
-        int num_lines = 0;       
+        int num_empty_lines = 0;
+        char *temp_buf[MAX];
+        int num_lines = 0;
         for (i = 2; (*argv)[i] != NULL; i++) {
             if (fp = fopen((*argv)[i], "r")) {
                 while (fgets(buf, MAX, fp)) {
@@ -92,10 +122,10 @@ void cat(char* (*argv)[])
                 fclose(fp);
             }
         }
-      
+
         for (i = 0; i < num_lines; i++) {
             printf("%s", temp_buf[i]);
-           
+
             if (i < num_lines - 1 && strcmp(temp_buf[i + 1], "\n") != 0) {
                 printf("\n");
             }
