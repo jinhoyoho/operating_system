@@ -101,7 +101,7 @@ int main()
 
                 grep(argv[arg_index], argv[arg_index + 1], show_line_numbers, invert_match, ignore_case);
             } else {
-                printf("grep ���ɾ��� ����: grep [-n] [-v] [-i] <����> <���ϸ�>\n");
+                printf("grep: grep [-n] [-v] [-i] <pattern> <filename>\n");
             }
         }
         else if (strcmp(argv[0], "cp") == 0)
