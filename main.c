@@ -14,6 +14,7 @@
 #include "grep.h"
 #include "rm.h"
 #include "chmod.h"
+#include "find_.h"
 
 #define MAXCOUNT 10
 
@@ -110,7 +111,7 @@ int main()
         }
         else if (strcmp(argv[0], "find") == 0)
         {
-            printf("find\n");
+            find_(argc, argv);
         }
         else if (strcmp(argv[0], "rm") == 0)
         {
