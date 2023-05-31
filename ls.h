@@ -1,4 +1,4 @@
-#include "./headers.h"
+    #include "./headers.h"
 
 int ls(char* (*argv)[])
 {
@@ -33,7 +33,6 @@ int ls(char* (*argv)[])
         }
         printf("\n");
         closedir(dir);
-
     }
     else if (strcmp((*argv)[1], "-l") == 0) // "-l"인 경우
     {
@@ -45,7 +44,7 @@ int ls(char* (*argv)[])
             user_id = getpwuid(file_state.st_uid); 
             group_id = getgrgid(file_state.st_gid); 
 
-            date = ctime(&file_state.st_mtime); 
+            date = ctime(&file_state.st_mtime);
             len = strlen(date); 
             int index = 0;
             char list[20];
@@ -81,7 +80,8 @@ int ls(char* (*argv)[])
 
                     printf("%s", list);
                 // 링크 수, 소유자 이름, 그룹 이름, 파일 크기, 날짜, 제목 출력
-                    printf(" %ld\t %s\t %s\t %lld\t %.*s\t %s\n", (long)file_state.st_nlink, user_id->pw_name, group_id->gr_name, (long long)file_state.st_size, len - 1, date, file_name->d_name);
+                    printf(" %ld\t %s\t %s\t %lld\t %.*s\t %s\n", (long)file_state.st_nlink, user_id->pw_name, 
+                        group_id->gr_name, (long long)file_state.st_size, len - 1, date, file_name->d_name);
                 }
             }
         closedir(dir);
@@ -158,6 +158,27 @@ int ls(char* (*argv)[])
             
             printf("%d %s\t", (unsigned)file_state.st_ino, file_name->d_name);
             // index 번호와 이름 출력
+        }
+        printf("\n");
+        closedir(dir);
+    }
+    else if (strcmp((*argv)[1], "-ai") == 0) // -i 옵션(file의 index 출력)
+    {
+        dir = opendir(".");
+        while ((file_name = readdir(dir)) != NULL)
+        {
+            stat(file_name->d_name, &file_state);
+
+            user_id = getpwuid(file_state.st_uid);
+            group_id = getgrgid(file_state.st_gid);
+
+            date = ctime(&file_state.st_mtime);
+            len = strlen(date);
+
+            char first_char = file_name->d_name[0]; // 첫 번째 글자 확인
+
+            printf("%d %s\t", (unsigned)file_state.st_ino, file_name->d_name);
+        // index 번호와 이름 출력
         }
         printf("\n");
         closedir(dir);
