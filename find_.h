@@ -15,7 +15,7 @@ void find_(int argc, char *argv[]);
 void find_files(const char *path);
 void name_recur(char *name, char *target);
 void type_recur(char *name, char *mode);
-int isAbsolutePath(const char *path);
+int isAbsolutePath_(const char *path);
 
 void find_(int argc, char *argv[]) {
     
@@ -238,6 +238,6 @@ void type_recur(char *name, char *mode) {
     return;
 }
 
-int isAbsolutePath(const char *path) {
+int isAbsolutePath_(const char *path) {
     return (path[0] == '/');
 }

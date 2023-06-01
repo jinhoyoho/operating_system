@@ -1,9 +1,3 @@
-//
-//  main.c
-//  OS_Test
-//
-//  Created by 최정흠 on 2023/05/12.
-//
 #include "./headers.h"
 
 #define MAX 1024
@@ -12,7 +6,7 @@ void mkdir_(int argc, char *argv[]);
 int build_dir(char *path, mode_t mode);
 int find_brace_pattern(char *target, int *start, int *end);
 int build_brace_dir(mode_t mode, char *real_path, int find_dirname, int start, int end);
-mode_t convert_mode_str_to_oct(const char *target);
+mode_t convert_mode_str_to_oct(const char* target);
 int isAbsolutePath(const char *path);
 void *pthread_mkdir_func(void *arg_);
 void print_log(FILE *dirFile, char *dir_name);
@@ -365,15 +359,15 @@ void *pthread_mkdir_func(void *arg_) {
     pthread_exit(NULL);
 }
 
-mode_t convert_mode_str_to_oct(const char *target) {
-    
+mode_t convert_mode_str_to_oct(const char* target) {
+
     mode_t result;
     size_t len;
-    
+
     len = strlen(target);
     if (strlen(target) >= 4)
         return -1;
-    
+
     result = 0;
     for (int i = 0; target[i] != '\0'; i++) {
         if (target[i] >= '0' && target[i] <= '7')
@@ -381,7 +375,7 @@ mode_t convert_mode_str_to_oct(const char *target) {
         else
             return -1;
     }
-    
+
     return result;
 }
 

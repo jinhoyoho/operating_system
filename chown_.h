@@ -17,7 +17,7 @@ int chown_(int argc, char* argv[])
     char* k;
     int location;
     k = strchr(argv[1], ':'); // argv[1]에서 :를 찾으면 그 위치의 주소가 k에 저장됨.
-    location = (int)(k - argv[1]); // ':'의 위치의 주소에서 argv[1]의 시작 주소 빼어 몇번째 있는지 알 수 있음.
+    location = (unsigned long)(k - argv[1]); // ':'의 위치의 주소에서 argv[1]의 시작 주소 빼어 몇번째 있는지 알 수 있음.
     int length = sizeof(argv[1]) / sizeof(argv[1][0]); //argv[1]의 크기 구하기
     char u_name[length];
     char g_name[length];
@@ -29,24 +29,27 @@ int chown_(int argc, char* argv[])
         g_name[j - location - 1] = argv[1][j];
     }
 
+    struct passwd* s_info;
+    struct group* g_info;
+    pw = getpwnam(u_name);
+    g_info = getgrnam(g_name);
 
     if (k == NULL) {    //:가 없다는 뜻이므로 user만 변경한다
         //이 파일에서 소유자(user)를 내가 입력한 소유자로 변경한다.
-        if (chown(argv[2], argv[1], -1) == -1)
-            printf("Fail");
+        if (chown(argv[2], pw->pw_uid, -1) == -1)
+            printf("Fail1\n");
     }
 
     else if (location == 0) {  //:를 찾았고 얘는 argv[1]의 0번째에(맨앞에) 위치. 즉 그룹만 변경한다.
         //이 파일에서 그룹을 내가 입력한 그룹으로 변경한다.
-        if (chown(argv[2], -1, g_name) == -1)
-            printf("Fail");
+        if (chown(argv[2], -1, g_info->gr_name) == -1)
+            printf("Fail2\n");
     }
     else {   //user와 group 모두 변경.
         //이 파일에서 소유자와 그룹을 모두 내가 입력한대로 변경한다.
-        if (chown(argv[2], u_name, g_name) == -1)
-            printf("Fail");
+        if (chown(argv[2], pw->pw_uid, g_info->gr_name) == -1)
+            printf("Fail3\n");
     }
 
     return 0;
 }
-#pragma once

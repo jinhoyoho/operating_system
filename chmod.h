@@ -1,35 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/stat.h>
-#include <dirent.h>
+#include "./headers.h"
 
-#define MAXCOUNT 10
-
-mode_t convert_mode_str_to_oct(const char *target) {
-
-    mode_t result;
-    size_t len;
-
-    len = strlen(target);
-    if (strlen(target) >= 4)
-        return -1;
-
-    result = 0;
-    for (int i = 0; target[i] != '\0'; i++) {
-        if (target[i] >= '0' && target[i] <= '7')
-            result |= (target[i] - '0') << (len - i - 1) * 3;
-        else
-            return -1;
-    }
-
-    return result;
-}
-
+mode_t convert_mode_str_to_oct_(const char* target);
 
 int chmod_(int argc, char *argv[])
 {
@@ -195,3 +166,22 @@ int chmod_(int argc, char *argv[])
     return 0;
 }
 
+mode_t convert_mode_str_to_oct_(const char* target) {
+
+    mode_t result;
+    size_t len;
+
+    len = strlen(target);
+    if (strlen(target) >= 4)
+        return -1;
+
+    result = 0;
+    for (int i = 0; target[i] != '\0'; i++) {
+        if (target[i] >= '0' && target[i] <= '7')
+            result |= (target[i] - '0') << (len - i - 1) * 3;
+        else
+            return -1;
+    }
+
+    return result;
+}
