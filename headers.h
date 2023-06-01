@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/syscall.h>     // mkdir
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -14,3 +15,4 @@
 #include <math.h>
 #include <regex.h>
 #include <pthread.h>
+#include <pthread/pthread.h> // mkdir

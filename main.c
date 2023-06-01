@@ -10,11 +10,12 @@
 #include "cat.h"
 #include "cp.h"
 #include "cd.h"
-//#include "mkdir.h"
+#include "mkdir_.h"
 #include "grep.h"
 #include "rm.h"
 #include "chmod.h"
 #include "find_.h"
+#include "chown_.h"
 
 #define MAXCOUNT 10
 
@@ -63,7 +64,7 @@ int main()
         }
         else if (strcmp(argv[0], "mkdir") == 0)
         {
-            //mkdir(argc, argv);
+            mkdir_(argc, argv);
         }
         else if (strcmp(argv[0], "cat") == 0)
         {
@@ -75,7 +76,7 @@ int main()
         }
         else if (strcmp(argv[0], "chown") == 0)
         {
-            printf("chown\n");
+            chown_(argc, argv);
         }
         else if (strcmp(argv[0], "grep") == 0)
         {
